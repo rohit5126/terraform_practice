@@ -1,0 +1,45 @@
+main.tf -
+"""
+resource "local_file" "env_file" {
+    for_each = tomap({
+        env1 = "Prod"
+        env2 = "test"
+        env3 = "dev"
+    })
+    filename = "${each.value}${var.filename}"
+    content = "${var.content} ${each.value}"
+
+  
+}
+"""
+
+outputs.tf -
+"""
+output "file_name" {
+    value = [
+        for key in local_file.env_file : key.filename
+    ]
+  
+}
+
+output "path" {
+    value = [
+        for key in local_file.env_file : abspath(key.filename)
+    ]
+  
+}
+"""
+
+variables.tf -
+"""
+variable "filename" {
+    default = "_file.txt "
+    type = string
+}
+
+variable "content" {
+    default = "thsi is a file in  environment"
+    type = string
+
+}
+"""
